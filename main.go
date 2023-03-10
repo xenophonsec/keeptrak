@@ -52,6 +52,7 @@ func main() {
 			fmt.Println("")
 			fmt.Print("Enter Case Name: ")
 			text, _ := reader.ReadString('\n')
+			fmt.Println("")
 			// convert CRLF to LF
 			CASE := strings.Replace(text, "\n", "", -1)
 			ensureCaseDir(CASE)
@@ -69,6 +70,9 @@ func main() {
 					if err != nil {
 						fmt.Println(err)
 					} else {
+						if command == "exit" {
+							return
+						}
 						LABEL := strings.Split(command, " ")[0]
 						text := string(out)
 						fmt.Println(text)

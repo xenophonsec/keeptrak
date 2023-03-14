@@ -56,7 +56,7 @@ func main() {
 			// convert CRLF to LF
 			CASE := strings.Replace(text, "\n", "", -1)
 			ensureCaseDir(CASE)
-			dbpath := ensureDB(CASE)
+			ensureDB(CASE)
 
 			for {
 				fmt.Print("KEEPTRAK> ")
@@ -67,7 +67,7 @@ func main() {
 					if command == "exit" {
 						return
 					}
-					saveLineToFile(CASE+"/history", command)
+					saveLineToFile(CASE+"/history", getTime()+"\t"+command)
 					cmd := exec.Command("bash", "-c", command)
 					pipe, _ := cmd.StdoutPipe()
 					if err := cmd.Start(); err != nil && err != io.EOF {
@@ -79,7 +79,6 @@ func main() {
 					for err == nil {
 						line = strings.ReplaceAll(line, "\n", "")
 						fmt.Println(line)
-						saveRecord(dbpath, LABEL, "", "FILE", "N")
 						saveLineToFile(CASE+"/"+LABEL, line)
 						saveLineToFile(CASE+"/dump", line)
 						line, err = reader.ReadString('\n')

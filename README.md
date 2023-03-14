@@ -17,7 +17,7 @@ Go v19 is the only prerequisite.
 ### Install using go
 
 ```
-go install github.com/xenophonsec/keeptrak
+go install github.com/xenophonsec/keeptrak@latest
 ```
 
 ### Build from source
@@ -26,8 +26,8 @@ go install github.com/xenophonsec/keeptrak
 git clone https://github.com/xenophonsec/keeptrak.git
 cd keeptrak
 go build
-chmod +x keeptrak
-./keeptrak phonenumber
+# or install globally
+go install
 ```
 
 

@@ -48,7 +48,7 @@ func main() {
 			// WRAPPED SHELL
 			reader := bufio.NewReader(os.Stdin)
 			fmt.Println("")
-			fmt.Println("K E E P T R A K \t" + getTime())
+			fmt.Println("K E E P T R A K   " + getTime())
 			fmt.Println("")
 			fmt.Print("Enter Case Name: ")
 			text, _ := reader.ReadString('\n')
@@ -64,25 +64,30 @@ func main() {
 				// convert CRLF to LF
 				command := strings.Replace(text, "\n", "", -1)
 				if command != "" {
+					if command == "exit" {
+						return
+					}
 					saveLineToFile(CASE+"/history", command)
-					out, err := exec.Command("bash", "-c", command).Output()
-					// TODO: https://pkg.go.dev/os/exec#Cmd.StdoutPipe
-					if err != nil {
+					cmd := exec.Command("bash", "-c", command)
+					pipe, _ := cmd.StdoutPipe()
+					if err := cmd.Start(); err != nil && err != io.EOF {
 						fmt.Println(err)
-					} else {
-						if command == "exit" {
-							return
-						}
-						LABEL := strings.Split(command, " ")[0]
-						text := string(out)
-						fmt.Println(text)
+					}
+					reader := bufio.NewReader(pipe)
+					line, err := reader.ReadString('\n')
+					LABEL := strings.Split(command, " ")[0]
+					for err == nil {
+						line = strings.ReplaceAll(line, "\n", "")
+						fmt.Println(line)
 						saveRecord(dbpath, LABEL, "", "FILE", "N")
-						saveLineToFile(CASE+"/"+LABEL, text)
-						saveLineToFile(CASE+"/dump", text)
-
+						saveLineToFile(CASE+"/"+LABEL, line)
+						saveLineToFile(CASE+"/dump", line)
+						line, err = reader.ReadString('\n')
+					}
+					if err != nil && err != io.EOF {
+						fmt.Println(err)
 					}
 				}
-
 			}
 		}
 	}

@@ -79,8 +79,8 @@ func main() {
 					for err == nil {
 						line = strings.ReplaceAll(line, "\n", "")
 						fmt.Println(line)
-						saveLineToFile(CASE+"/"+LABEL, line)
-						saveLineToFile(CASE+"/dump", line)
+						saveLineToFile(filepath.Join(CASE, LABEL), line)
+						saveLineToFile(filepath.Join(CASE, "dump"), line)
 						line, err = reader.ReadString('\n')
 					}
 					if err != nil && err != io.EOF {

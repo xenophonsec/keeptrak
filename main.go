@@ -28,19 +28,33 @@ func main() {
 	} else {
 		if len(os.Args) == 2 {
 			if os.Args[1] == "--help" {
-				fmt.Println("USAGE: keeptrak CASE LABEL VALUE DATA_TYPE CONFIRMED")
+				fmt.Println("")
+				fmt.Println("Run Nested Shell: keeptrak")
+				fmt.Println("")
+				fmt.Println("Save Record: keeptrak CASE LABEL VALUE DATA_TYPE CONFIRMED")
+				fmt.Println("\tExample: keeptrak johndoe username jdoe credential Y")
+				fmt.Println("")
+				fmt.Println("Save Note: keeptrak note TEXT")
+				fmt.Println("\tExample: keeptrak note \"This is useful information\"")
+				fmt.Println("")
+			} else {
+				fmt.Println("Unknown command: " + os.Args[1])
 			}
 		} else if len(os.Args) > 2 {
-			if len(os.Args) < 6 {
+			CASE := os.Args[1]
+			ensureCaseDir(CASE)
+			if len(os.Args) == 4 {
+				if os.Args[2] == "note" {
+					saveLineToFile(filepath.Join(CASE, "notes"), getTime()+"\t"+os.Args[3])
+				}
+			} else if len(os.Args) < 6 {
 				fmt.Println("Too few arguments. Run --help to see correct usage")
 			} else {
 				// WITH ARGUMENTS
-				CASE := os.Args[1]
 				LABEL := os.Args[2]
 				VALUE := os.Args[3]
 				DATATYPE := os.Args[4]
 				CONFIRMED := os.Args[5]
-				ensureCaseDir(CASE)
 				dbpath := ensureDB(CASE)
 				saveRecord(dbpath, LABEL, VALUE, DATATYPE, CONFIRMED)
 			}
@@ -66,6 +80,10 @@ func main() {
 				if command != "" {
 					if command == "exit" {
 						return
+					}
+					if strings.HasPrefix(command, "note: ") {
+						saveLineToFile(filepath.Join(CASE, "notes"), getTime()+"\t"+command[6:])
+						continue
 					}
 					saveLineToFile(CASE+"/history", getTime()+"\t"+command)
 					cmd := exec.Command("bash", "-c", command)

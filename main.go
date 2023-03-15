@@ -130,6 +130,7 @@ func saveLineToFile(filePath string, content string) {
 	if err != nil {
 		fmt.Println("Failed to open to file", filePath)
 	} else {
+		content = stripColorCodes(content)
 		_, err := f.WriteString(content + "\n")
 		if err != nil {
 			fmt.Println("Failed to write to file", filePath)
@@ -165,4 +166,16 @@ func getTime() string {
 
 func saveRecord(dbpath string, LABEL string, VALUE string, DATATYPE string, CONFIRMED string) {
 	saveLineToFile(dbpath, LABEL+","+VALUE+","+DATATYPE+","+CONFIRMED+","+getTime())
+}
+
+func stripColorCodes(str string) string {
+	codePrefix := "\033["
+	codeSuffix := "m"
+	for strings.Contains(str, codePrefix) {
+		prefixIndex := strings.Index(str, codePrefix)
+		sub := str[prefixIndex:]
+		code := str[prefixIndex : prefixIndex+strings.Index(sub, codeSuffix)+1]
+		str = strings.ReplaceAll(str, code, "")
+	}
+	return str
 }

@@ -4,7 +4,7 @@ Track recon/OSINT commands in an organized, grepable, fasion.
 
 **No more saving and organizing terminal output manually.**
 
-Keeptrak is a case management system for hackers, bug bounty hunters, and general cyber security professionals. It runs a nested shell where you can run your usual scans and commands but in the background it saves the output and commands run in various ways. You can also store notes and evidence records with timestamps for backtracking later on.
+Keeptrak is a case management system for ethical hackers, bug bounty hunters, OSINT investigators, and cyber security professionals. It runs a nested shell where you can run your usual scans and commands but in the background it saves and timestamps the output, keeping an organized. grepable, history and list of records. You can also store timestamped notes in text format and evidence records in a csv file. Keeptrak is designed to work not only as a nested shell but also integrates with other programs by accepting and echoing data via pipes. This means you can pipe information into keeptrak without being in the nested shell and even pass information through it to another program. 
 
 Example Output:
 - casedirectory (folder of case files)
@@ -27,13 +27,15 @@ Example Output:
 
 ## Installation
 
-Go v19 is the only prerequisite.
+Go v19 or higher is the only prerequisite.
 
 ### Install using go
 
 ```
 go install github.com/xenophonsec/keeptrak@latest
 ```
+
+Make sure the go bin path has been added to your PATH global variable.
 
 ### Build from source
 
@@ -45,6 +47,16 @@ go build
 go install
 ```
 
+If installing globally is not working, you can do so mannually.
+
+```
+export PATH="$PATH:/path/to/keeptrak"
+```
+Replace "/path/to/keeptrak" with the actual path to the keeptrak directory.
+Running this command will only work temporarily. If you want the install to be permenant, you should add this command to the bottom of your .bashrc file.
+```
+echo "export PATH=\"\$PATH:/path/to/keeptrak\"" >> ~/.bashrc
+```
 
 ## Nested Shell
 
@@ -55,6 +67,11 @@ keeptrak
 Enter Case Name: mywebsite
 KEEPTRAK> nmap -sV mywebsite
 ```
+
+To exit the nested shell, type and run `exit`.
+
+The output of every command that is run will be stored in a file named after the command within a directory named after the case name provided.
+Every command is also added to the history file and timestamped.
 
 ## Pipes
 
@@ -121,7 +138,7 @@ Just as a friendly recommendation, you can use tags to create more searchable no
 
 ## Store Findings Records
 
-You can store individual records in a case database by providing the values as arguments.
+You can store individual records in a csv case database by providing the values as arguments.
 This can be used for any data found in an investigation: usernames, passwords, hashes, etc...
 
 Usage:

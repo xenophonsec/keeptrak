@@ -37,6 +37,9 @@ func main() {
 				fmt.Println("Save Note: keeptrak note TEXT")
 				fmt.Println("\tExample: keeptrak note \"This is useful information\"")
 				fmt.Println("")
+				fmt.Println("Pipe data: keeptrak CASE LABEL")
+				fmt.Println("\tExample: nmap 192.168.88.1 | keeptrak case103 nmap")
+				fmt.Println("")
 			} else {
 				fmt.Println("Unknown command: " + os.Args[1])
 			}

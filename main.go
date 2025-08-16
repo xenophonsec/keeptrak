@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"crypto/sha256"
+	"encoding/hex"
 )
 
 func main() {
@@ -181,4 +183,10 @@ func stripColorCodes(str string) string {
 		str = strings.ReplaceAll(str, code, "")
 	}
 	return str
+}
+
+func generateHash(str string) string {
+	hash := sha256.New()
+	hash.Write([]byte(str))
+	return hex.EncodeToString(hash.Sum(nil))
 }

@@ -24,6 +24,7 @@ Example Output:
 - [Scripting](#scripting)
 - [Notes](#quick-notes)
 - [Findings Records](#store-findings-records)
+- [Trust Chains](#trust-chains)
 
 ## Installation
 
@@ -154,3 +155,10 @@ You can even do this within the nested shell
 ```
 KEEPTRAK> keeptrak myosint username happyfeet credential Y
 ```
+
+## Trust Chains
+
+Keeptrak signs the history of commands with hashes that include all previous commands, the current command, and a timestamp. This creates a chain of trust for verifying that the evidence has not been tampered with.
+
+Signatures consist of the letter D followed by the date (YYYYMMDD), the letter T followed by the time (HHMMSS) and the letter H followed by the hash (SHA256). Due to the format, these signatures are referred to as DTH signatures.
+

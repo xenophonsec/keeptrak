@@ -211,7 +211,7 @@ func saveLineToFileWithSignature(filePath string, line string) {
 }
 
 func generateSignature(str string) string {
-	timestamp := time.Now().Format("20060102150405")
+	timestamp := time.Now().Format("D20060102T150405")
 	hash := sha256.New()
 	hash.Write([]byte(str+timestamp))
 	return timestamp + "H" + hex.EncodeToString(hash.Sum(nil))

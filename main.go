@@ -12,6 +12,7 @@ import (
 	"time"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 )
 
 func main() {
@@ -96,7 +97,7 @@ func main() {
 						continue
 					}
 					// handle nested bash
-					saveLineToFile(CASE+"/history", getTime()+"\t"+command)
+					saveLineToFileWithSignature(filepath.Join(CASE, "history"), command + "\t")
 					cmd := exec.Command("bash", "-c", command)
 					pipe, _ := cmd.StdoutPipe()
 					if err := cmd.Start(); err != nil && err != io.EOF {
@@ -191,8 +192,27 @@ func stripColorCodes(str string) string {
 	return str
 }
 
-func generateHash(str string) string {
+func getFileContents(filePath string) string {
+	b, err := os.ReadFile(filePath)
+    if err != nil {
+		fmt.Println("Failed to read file: " + filePath)
+        fmt.Println(err)
+    }
+    return string(b)
+}
+
+func saveLineToFileWithSignature(filePath string, line string) {
+	fileContent := ""
+	if _, err := os.Stat(filePath); !errors.Is(err, os.ErrNotExist) {
+		fileContent = getFileContents(filePath)
+	}
+	line = line + generateSignature(fileContent + line)
+	saveLineToFile(filePath, line)
+}
+
+func generateSignature(str string) string {
+	timestamp := time.Now().Format("20060102150405")
 	hash := sha256.New()
-	hash.Write([]byte(str))
-	return hex.EncodeToString(hash.Sum(nil))
+	hash.Write([]byte(str+timestamp))
+	return timestamp + "H" + hex.EncodeToString(hash.Sum(nil))
 }

@@ -29,6 +29,7 @@ func main() {
 		}
 	} else {
 		if len(os.Args) == 2 {
+			// handle help
 			if os.Args[1] == "--help" {
 				fmt.Println("")
 				fmt.Println("Run Nested Shell: keeptrak")
@@ -43,19 +44,21 @@ func main() {
 				fmt.Println("\tExample: nmap 192.168.88.1 | keeptrak case103 nmap")
 				fmt.Println("")
 			} else {
+				// handle unknown command
 				fmt.Println("Unknown command: " + os.Args[1])
 			}
 		} else if len(os.Args) > 2 {
 			CASE := os.Args[1]
 			ensureCaseDir(CASE)
 			if len(os.Args) == 4 {
+				// handle note command
 				if os.Args[2] == "note" {
 					saveLineToFile(filepath.Join(CASE, "notes"), getTime()+"\t"+os.Args[3])
 				}
 			} else if len(os.Args) < 6 {
 				fmt.Println("Too few arguments. Run --help to see correct usage")
 			} else {
-				// WITH ARGUMENTS
+				// save to csv db
 				LABEL := os.Args[2]
 				VALUE := os.Args[3]
 				DATATYPE := os.Args[4]
@@ -83,13 +86,16 @@ func main() {
 				// convert CRLF to LF
 				command := strings.Replace(text, "\n", "", -1)
 				if command != "" {
+					// handle exit command
 					if command == "exit" {
 						return
 					}
+					// handle note command
 					if strings.HasPrefix(command, "note: ") {
 						saveLineToFile(filepath.Join(CASE, "notes"), getTime()+"\t"+command[6:])
 						continue
 					}
+					// handle nested bash
 					saveLineToFile(CASE+"/history", getTime()+"\t"+command)
 					cmd := exec.Command("bash", "-c", command)
 					pipe, _ := cmd.StdoutPipe()

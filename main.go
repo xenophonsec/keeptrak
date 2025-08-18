@@ -2,17 +2,18 @@ package main
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
-	"crypto/sha256"
-	"encoding/hex"
-	"errors"
 )
 
 func main() {
@@ -97,7 +98,7 @@ func main() {
 						continue
 					}
 					// handle nested bash
-					saveLineToFileWithSignature(filepath.Join(CASE, "history"), command + "\t")
+					saveLineToFile(filepath.Join(CASE, "history"), getTime()+"\t"+command)
 					cmd := exec.Command("bash", "-c", command)
 					pipe, _ := cmd.StdoutPipe()
 					if err := cmd.Start(); err != nil && err != io.EOF {
@@ -106,13 +107,19 @@ func main() {
 					reader := bufio.NewReader(pipe)
 					line, err := reader.ReadString('\n')
 					LABEL := strings.Split(command, " ")[0]
+					totalOutput := ""
+					lineCount := 0
+					// loop through each line of output
 					for err == nil {
+						totalOutput += line
+						lineCount++
 						line = strings.ReplaceAll(line, "\n", "")
 						fmt.Println(line)
 						saveLineToFile(filepath.Join(CASE, LABEL), line)
 						saveLineToFile(filepath.Join(CASE, "dump"), line)
 						line, err = reader.ReadString('\n')
 					}
+					saveCommandSignature(CASE, LABEL, command, totalOutput, lineCount)
 					if err != nil && err != io.EOF {
 						fmt.Println(err)
 					}
@@ -194,25 +201,28 @@ func stripColorCodes(str string) string {
 
 func getFileContents(filePath string) string {
 	b, err := os.ReadFile(filePath)
-    if err != nil {
+	if err != nil {
 		fmt.Println("Failed to read file: " + filePath)
-        fmt.Println(err)
-    }
-    return string(b)
+		fmt.Println(err)
+	}
+	return string(b)
 }
 
-func saveLineToFileWithSignature(filePath string, line string) {
+func saveCommandSignature(CASE string, LABEL string, command string, output string, numOflines int) {
 	fileContent := ""
+	filePath := filepath.Join(CASE, ".trustchain")
 	if _, err := os.Stat(filePath); !errors.Is(err, os.ErrNotExist) {
 		fileContent = getFileContents(filePath)
 	}
-	line = line + generateSignature(fileContent + line)
+	data := fileContent + output
+	line := LABEL + "\t" + strconv.Itoa(numOflines) + "\t" + command + "\t"
+	line += generateSignature(data + line)
 	saveLineToFile(filePath, line)
 }
 
 func generateSignature(str string) string {
 	timestamp := time.Now().Format("D20060102T150405")
 	hash := sha256.New()
-	hash.Write([]byte(str+timestamp))
+	hash.Write([]byte(str + timestamp))
 	return timestamp + "H" + hex.EncodeToString(hash.Sum(nil))
 }

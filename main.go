@@ -37,10 +37,15 @@ func main() {
 				fmt.Println("")
 				fmt.Println("    WITHIN NESTED MODE")
 				fmt.Println("")
-				fmt.Println("    You can run any keeptrak commands normally or use the following shortcuts (commands followed by a colon)")
+				fmt.Println("    You can run any keeptrak commands normally or use nested commands.")
+				fmt.Println("    Nested commands are triggered by using a colon followed by a space after the command.")
 				fmt.Println("    Example: you can store a note by running KEEPTRAK> note: this is my note")
 				fmt.Println("    Instead of KEEPTRAK> keeptrak note \"this is my note\"")
-				fmt.Println("    - note")
+				fmt.Println("    - note: TEXT")
+				fmt.Println("        Any and all text following the nested note command will be saved as the note.")
+				fmt.Println("    - record: LABEL VALUE DATA_TYPE CONFIRMED")
+				fmt.Println("        The nested record command requires at least the first two parameters.")
+				fmt.Println("        DATA_TYPE and CONFIRMED are optional with the default values of null and N.")
 				fmt.Println("")
 				fmt.Println("Save Record: keeptrak CASE LABEL VALUE DATA_TYPE CONFIRMED")
 				fmt.Println("\tExample: keeptrak johndoe username jdoe credential Y")
@@ -103,6 +108,26 @@ func main() {
 					}
 					if strings.HasPrefix(command, "note: ") {
 						saveLineToFile(filepath.Join(CASE, "notes"), getTime()+"\t"+command[6:])
+						continue
+					}
+					if strings.HasPrefix(command, "record: ") {
+						Args := strings.Split(command[8:], " ")
+						if len(Args) < 2 {
+							fmt.Println("Record command requires at least two arguements (record: LABEL VALUE)")
+							continue
+						}
+						LABEL := Args[0]
+						VALUE := Args[1]
+						DATATYPE := "null"
+						CONFIRMED := "N"
+						if len(Args) > 2 {
+							DATATYPE = Args[2]
+						}
+						if len(Args) > 3 {
+							CONFIRMED = Args[3]
+						}
+						dbpath := ensureDB(CASE)
+						saveRecord(dbpath, LABEL, VALUE, DATATYPE, CONFIRMED)
 						continue
 					}
 					saveLineToFile(CASE+"/history", getTime()+"\t"+command)

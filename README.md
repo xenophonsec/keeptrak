@@ -64,8 +64,24 @@ Running keeptrak with no commands will launch the nested shell, which stores you
 
 ```
 keeptrak
+
+K E E P T R A K   YYYY.DD.MM HH:MM:SS
+
 Enter Case Name: mywebsite
+
 KEEPTRAK> nmap -sV mywebsite
+```
+
+To reduce the length of the nested shell prefix, use the -k option.
+
+```
+keeptrak -k
+
+K E E P T R A K   YYYY.DD.MM HH:MM:SS
+
+Enter Case Name: mywebsite
+
+K> nmap -sV mywebsite
 ```
 
 To exit the nested shell, type and run `exit`.

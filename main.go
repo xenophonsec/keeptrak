@@ -46,6 +46,10 @@ func main() {
 				fmt.Println("    - record: LABEL VALUE DATA_TYPE CONFIRMED")
 				fmt.Println("        The nested record command requires at least the first two parameters.")
 				fmt.Println("        DATA_TYPE and CONFIRMED are optional with the default values of null and N.")
+				fmt.Println("    - ghost: BASH")
+				fmt.Println("        The ghost command will run whatever follows without recording it anywhere.")
+				fmt.Println("        Example: ghost: ls")
+				fmt.Println("        For short hand you can use g: ")
 				fmt.Println("")
 				fmt.Println("Save Record: keeptrak CASE LABEL VALUE DATA_TYPE CONFIRMED")
 				fmt.Println("\tExample: keeptrak johndoe username jdoe credential Y")
@@ -130,7 +134,18 @@ func main() {
 						saveRecord(dbpath, LABEL, VALUE, DATATYPE, CONFIRMED)
 						continue
 					}
-					saveLineToFile(CASE+"/history", getTime()+"\t"+command)
+					ghostMode := false
+					if strings.HasPrefix(command, "ghost: ") {
+						ghostMode = true
+						command = command[7:]
+					}
+					if strings.HasPrefix(command, "g: ") {
+						ghostMode = true
+						command = command[3:]
+					}
+					if !ghostMode {
+						saveLineToFile(CASE+"/history", getTime()+"\t"+command)
+					}
 					cmd := exec.Command("bash", "-c", command)
 					pipe, _ := cmd.StdoutPipe()
 					if err := cmd.Start(); err != nil && err != io.EOF {
@@ -142,8 +157,10 @@ func main() {
 					for err == nil {
 						line = strings.ReplaceAll(line, "\n", "")
 						fmt.Println(line)
-						saveLineToFile(filepath.Join(CASE, LABEL), line)
-						saveLineToFile(filepath.Join(CASE, "dump"), line)
+						if !ghostMode {
+							saveLineToFile(filepath.Join(CASE, LABEL), line)
+							saveLineToFile(filepath.Join(CASE, "dump"), line)
+						}
 						line, err = reader.ReadString('\n')
 					}
 					if err != nil && err != io.EOF {

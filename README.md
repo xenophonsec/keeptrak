@@ -61,6 +61,8 @@ echo "export PATH=\"\$PATH:/path/to/keeptrak\"" >> ~/.bashrc
 ## Nested Shell
 
 Running keeptrak with no commands will launch the nested shell, which stores your command hitory and records all output.
+The output of every command that is run will be stored in a file named after the command within a directory named after the case name provided.
+Every command is also added to the history file and timestamped.
 
 ```
 keeptrak
@@ -72,6 +74,7 @@ Enter Case Name: mywebsite
 KEEPTRAK> nmap -sV mywebsite
 ```
 
+### K Mode
 To reduce the length of the nested shell prefix, use the -k option.
 
 ```
@@ -84,10 +87,21 @@ Enter Case Name: mywebsite
 K> nmap -sV mywebsite
 ```
 
-To exit the nested shell, type and run `exit`.
+### Ghost Mode
+If you want to run a command but do not want to record the output, such as running ls, you can use the ghost mode nested command (`ghost: `).
+As with all nested commands, the space after the colon is required.
 
-The output of every command that is run will be stored in a file named after the command within a directory named after the case name provided.
-Every command is also added to the history file and timestamped.
+```
+KEEPTRAK> ghost: ls
+```
+
+For short hand, you can use `g: `.
+
+```
+KEEPTRAK> g: ls
+```
+
+To exit the nested shell, type and run `exit`.
 
 ## Pipes
 

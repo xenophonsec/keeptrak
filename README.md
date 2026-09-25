@@ -166,7 +166,7 @@ Example:
 keeptrak myosint username happyfeet credential Y
 ```
 
-You can even do this within the nested shell
+You can do this within the nested shell using the nested command `record: `
 ```
-KEEPTRAK> keeptrak myosint username happyfeet credential Y
+KEEPTRAK> record: username happyfeet credential Y
 ```

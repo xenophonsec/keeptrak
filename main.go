@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	kmode := false
 	// WITH PIPED DATA
 	if isInputFromPipe() {
 		if len(os.Args) > 1 {
@@ -37,10 +38,15 @@ func main() {
 				fmt.Println("Save Note: keeptrak note TEXT")
 				fmt.Println("\tExample: keeptrak note \"This is useful information\"")
 				fmt.Println("")
+				return
+			} else if os.Args[1] == "-k" {
+				kmode = true
 			} else {
 				fmt.Println("Unknown command: " + os.Args[1])
+				return
 			}
-		} else if len(os.Args) > 2 {
+		}
+		if len(os.Args) > 2 {
 			CASE := os.Args[1]
 			ensureCaseDir(CASE)
 			if len(os.Args) == 4 {
@@ -73,7 +79,11 @@ func main() {
 			ensureDB(CASE)
 
 			for {
-				fmt.Print("KEEPTRAK> ")
+				if kmode {
+					fmt.Print("K> ")
+				} else {
+					fmt.Print("KEEPTRAK> ")
+				}
 				text, _ := reader.ReadString('\n')
 				// convert CRLF to LF
 				command := strings.Replace(text, "\n", "", -1)

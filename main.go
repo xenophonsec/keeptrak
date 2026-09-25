@@ -65,7 +65,7 @@ func main() {
 				}
 			} else if len(os.Args) < 6 {
 				fmt.Println("Too few arguments. Run --help to see correct usage")
-			} else {
+			} else if len(os.Args) == 6 {
 				// WITH ARGUMENTS
 				LABEL := os.Args[2]
 				VALUE := os.Args[3]
